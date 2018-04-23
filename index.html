@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+
+  <title>Hello, world!</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h1>Five Minute Timer!</h1>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        What are you working on?
+        <input id="task-description" type="text" class="form-control" />
+      </div>
+      <div class="card-footer">
+        <h2 id="timer-text" style="display:inline-block">5:00</h2>
+        <a href="#" class="btn btn-primary" id="timer-start">Start</a>
+        <a href="#" class="btn btn-primary" id="timer-done" disabled>Done</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col">
+            <textarea id="task-content" class="form-control" style="height:100%; min-height: 50px"></textarea>
+          </div>
+          <div class="col">
+            <div id="task-content-rendered"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h2>Tasks done</h2>
+    <div id="previous-tasks"></div>
+
+  </div>
+
+  <!-- Optional JavaScript -->
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/markdown-it@8.4.1/dist/markdown-it.min.js"></script>
+  <script>
+    let md = window.markdownit("commonmark");
+    function description() {
+      return $("#task-description")
+    }
+    function textarea() {
+      return $("#task-content")
+    }
+    function preview() {
+      return $("#task-content-rendered")
+    }
+    function previousTasks() {
+      return $("#previous-tasks")
+    }
+    function startButton() {
+      return $("#timer-start")
+    }
+    function doneButton() {
+      return $("#timer-done")
+    }
+    function timerText() {
+      return $("#timer-text")
+    }
+
+    function rerender() {
+      const content = textarea().val()
+      preview().html(md.render(content))
+    }
+    function zeroLeftPad(val, length) {
+      const s = "00000" + val
+      return s.substr(s.length - length)
+    }
+    function renderTimer(timeLeft) {
+      const minutes = Math.floor(timeLeft / 60000)
+      const seconds = Math.ceil((timeLeft - minutes * 60000) / 1000)
+      timerText().text(minutes + ":" + zeroLeftPad(seconds, 2))
+    }
+    const FIVE_MINUTES = 5 * 60 * 1000;
+    function start() {
+      description().attr("readonly", "true")
+      textarea().removeAttr("readonly").focus()
+      startButton().hide()
+      doneButton().show()
+      const startTime = performance.now()
+      renderTimer(FIVE_MINUTES)
+      const interval = setInterval(function () {
+        const delta = performance.now() - startTime;
+        if (delta >= FIVE_MINUTES) {
+          timerDone()
+          return;
+        }
+        renderTimer(FIVE_MINUTES - delta)
+      }, 1000)
+      function timerDone() {
+        clearInterval(interval)
+        done()
+        doneButton().off('click')
+      }
+      doneButton().click(timerDone)
+    }
+    function done() {
+      if (preview().text().trim() !== '') {
+        const contentHtml = preview().html()
+        const title = description().val().trim()
+        const node = $(
+          "<div class='card'>"
+          + (
+            title &&
+            (
+              "<div class='card-header'>"
+              + title
+              + "</div>"
+            )
+          )
+          + "<div class='card-body'>"
+          + contentHtml
+          + "</div>"
+          + "</div>"
+        )
+        previousTasks().prepend(node)
+      }
+      startButton().show()
+      doneButton().hide()
+      textarea().val("").attr("readonly", "true")
+      description().val("").removeAttr("readonly")
+      rerender()
+      timerText().text("5:00")
+    }
+    textarea().keyup(rerender)
+    startButton().click(function () {
+      start()
+    })
+  </script>
+</body>
+
+</html>
