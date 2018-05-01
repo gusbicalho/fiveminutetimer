@@ -3,7 +3,7 @@ import './Editor.css';
 
 export const Editor = ({ value, onChange, style, readOnly, disabled }) => (
   <textarea
-    className='editor'
+    className='editor form-control'
     style={style}
     value={value}
     onChange={onChange}

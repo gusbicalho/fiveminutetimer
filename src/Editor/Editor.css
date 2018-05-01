@@ -1,3 +1,4 @@
 textarea.editor {
-  font-family: Monaco, 'Lucida Sans Typewriter', Consolas, monospace
+  font-family: Monaco, 'Lucida Sans Typewriter', Consolas, monospace;
+  height: 50vh;
 }
