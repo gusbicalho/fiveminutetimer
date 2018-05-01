@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 function zeroLeftPad(val, length) {
   const s = "00000" + val

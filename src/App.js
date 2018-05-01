@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { CycleEditor } from './CycleEditor'
-import { NewTimer, RunningTimer } from './TimerForm'
+import { NewTimer, RunningTimer } from './Timer'
 import { DescriptionEditor } from './DescriptionEditor'
 import { FinishedCycle } from './FinishedCycle'
 
