@@ -3,6 +3,8 @@ import { CycleEditor } from './CycleEditor'
 import { NewTimer, RunningTimer } from './Timer'
 import { DescriptionEditor } from './DescriptionEditor'
 import { FinishedCycle } from './FinishedCycle'
+import { Toggle } from './Toggle'
+import uuidv4 from 'uuid/v4'
 
 const FIVE_MINUTES_MS = 0.1 * 60 * 1000;
 
@@ -52,7 +54,10 @@ const Updaters = {
     description.trim() === '' ? {} : {
       description: '',
       timerStart: performance.now(),
-      cycle: { description: description.trim() },
+      cycle: {
+        id: uuidv4(),
+        description: description.trim(),
+      },
     }
   ),
   createTimer: ({ durationMs, interval }) => unlessCurrentTimerSet(({ timerStart }) => ({
@@ -179,10 +184,22 @@ class App extends Component {
             }
           </div>
         </div>
-        <div>
-          <h2>Cycles done</h2>
-          {finishedCycles.map((cycle, i) => <FinishedCycle key={i} {...cycle} />)}
-        </div>
+        {finishedCycles &&
+          <div>
+            <h2>Cycles done</h2>
+            {finishedCycles[0] &&
+              <FinishedCycle {...finishedCycles[0]} />
+            }
+            {finishedCycles.slice(1).map((cycle, i) => (
+              <Toggle initialStatus={true} key={cycle.id}>{({ toggle, status }) => (
+                <FinishedCycle
+                  {...cycle}
+                  toggleCollapse={toggle}
+                  collapsed={status} />
+              )}</Toggle>
+            ))}
+          </div>
+        }
         <button onClick={() => console.log(this.state)}>Dump</button>
       </div >
     );
