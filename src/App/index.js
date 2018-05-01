@@ -1,47 +1,27 @@
 import React, { Component } from 'react'
-import { CycleEditor } from './CycleEditor'
-import { NewTimer, RunningTimer } from './Timer'
-import { DescriptionEditor } from './DescriptionEditor'
-import { FinishedCyclesList } from './FinishedCyclesList'
 import uuidv4 from 'uuid/v4'
+import { CycleEditor } from '../CycleEditor'
+import { NewTimer, RunningTimer } from '../Timer'
+import { DescriptionEditor } from '../DescriptionEditor'
+import { FinishedCyclesList } from '../FinishedCyclesList'
+import {
+  bindUpdaters, compose, composeUpdaters,
+  shallowMerger, updateIn, updateKey,
+} from '../ActionsFramework'
 
 const FIVE_MINUTES_MS = 0.1 * 60 * 1000;
 
-const applyUpdater = (stateUpdater, state) =>
-  typeof stateUpdater === 'function' ? stateUpdater(state) : stateUpdater;
-
-const shallowMerger = (stateUpdater) => (state) => {
-  const update = typeof stateUpdater === 'function' ? stateUpdater(state) : stateUpdater;
-  return typeof state === 'object' ? { ...state, ...update } : update
-}
-
-const compose = (...funcs) => (arg) => funcs.reduceRight((v, f) => f(v), arg)
-
-const composeUpdaters = (...updaters) => (state) =>
-  updaters.reduceRight(
-    (state, updater) => Object.assign(state, applyUpdater(updater, state)),
-    { ...state }
-  )
-
-const unlessCurrentTimerSet = (stateUpdater) => (state) => {
+export const unlessCurrentTimerSet = (stateUpdater) => (state) => {
   if (state.currentTimer)
     return {}
   return typeof stateUpdater === 'function' ? stateUpdater(state) : stateUpdater;
 }
 
-const ifCurrentTimerSet = (stateUpdater) => (state) => {
+export const ifCurrentTimerSet = (stateUpdater) => (state) => {
   if (state.currentTimer)
     return typeof stateUpdater === 'function' ? stateUpdater(state) : stateUpdater;
   return {};
 }
-
-const empty = {}
-
-const updateKey = (key) => (updater) => shallowMerger((state) => ({
-  [key]: applyUpdater(updater, (state || empty)[key])
-}))
-
-const updateIn = (...keys) => compose.apply(undefined, keys.map(updateKey))
 
 const Updaters = {
   clearTimer: () => composeUpdaters(
@@ -82,19 +62,6 @@ const Updaters = {
   updateInterimDescription: (description) => ({ description }),
 }
 
-const bindUpdaters = (component, updaters, argMappers = {}) => {
-  const actions = {}
-  for (const key of Object.keys(updaters)) {
-    const argMapper = argMappers[key]
-    if (argMapper) {
-      actions[key] = (arg) => component.setState(updaters[key](argMapper(arg)))
-    } else {
-      actions[key] = (arg) => component.setState(updaters[key](arg))
-    }
-  }
-  return actions
-}
-
 const countdown = ({ shouldClearFn, timerStartFn, durationMsFn, onCountdownEnd, onUpdate }) => {
   const interval = setInterval(() => {
     if (shouldClearFn(interval)) {
@@ -111,7 +78,7 @@ const countdown = ({ shouldClearFn, timerStartFn, durationMsFn, onCountdownEnd, 
   return interval;
 }
 
-class App extends Component {
+export class App extends Component {
 
   TIMER_DURATION_MS = FIVE_MINUTES_MS
 
@@ -194,5 +161,3 @@ class App extends Component {
     );
   }
 }
-
-export default App;
