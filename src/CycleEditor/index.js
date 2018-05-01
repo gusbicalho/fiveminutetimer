@@ -1,8 +1,10 @@
 import React from 'react'
-import { Editor } from '../Editor';
+import './CycleEditor.css';
 
-export const CycleEditor = ({ cycle, onChangeContent }) => (
-  <Editor
+export const CycleEditor = ({ cycle, onChangeContent, style }) => (
+  <textarea
+    className='cycle-editor form-control'
+    style={style}
     value={(cycle && cycle.content) || ''}
     onChange={onChangeContent}
     readOnly={!cycle}

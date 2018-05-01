@@ -9,7 +9,7 @@ import {
   shallowMerger, updateIn, updateKey,
 } from '../ActionsFramework'
 
-const FIVE_MINUTES_MS = 0.1 * 60 * 1000;
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
 export const unlessCurrentTimerSet = (stateUpdater) => (state) => {
   if (state.currentTimer)
@@ -156,7 +156,6 @@ export class App extends Component {
             <FinishedCyclesList cycles={finishedCycles} />
           </div>
         }
-        <button onClick={() => console.log(this.state)}>Dump</button>
       </div >
     );
   }
