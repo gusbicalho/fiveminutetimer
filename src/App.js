@@ -2,8 +2,7 @@ import React, { Component } from 'react'
 import { CycleEditor } from './CycleEditor'
 import { NewTimer, RunningTimer } from './Timer'
 import { DescriptionEditor } from './DescriptionEditor'
-import { FinishedCycle } from './FinishedCycle'
-import { Toggle } from './Toggle'
+import { FinishedCyclesList } from './FinishedCyclesList'
 import uuidv4 from 'uuid/v4'
 
 const FIVE_MINUTES_MS = 0.1 * 60 * 1000;
@@ -186,18 +185,8 @@ class App extends Component {
         </div>
         {finishedCycles &&
           <div>
-            <h2>Cycles done</h2>
-            {finishedCycles[0] &&
-              <FinishedCycle {...finishedCycles[0]} />
-            }
-            {finishedCycles.slice(1).map((cycle, i) => (
-              <Toggle initialStatus={true} key={cycle.id}>{({ toggle, status }) => (
-                <FinishedCycle
-                  {...cycle}
-                  toggleCollapse={toggle}
-                  collapsed={status} />
-              )}</Toggle>
-            ))}
+            <h2>Previous cycles</h2>
+            <FinishedCyclesList cycles={finishedCycles} />
           </div>
         }
         <button onClick={() => console.log(this.state)}>Dump</button>
