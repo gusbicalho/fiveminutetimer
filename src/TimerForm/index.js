@@ -13,25 +13,29 @@ function renderTime(timeMs) {
   return minutes + ":" + zeroLeftPad(seconds, 2)
 }
 
-export const NewTimer = ({ durationMs, onStart }) => (
-  <div>
-    {renderTime(durationMs)}
+const TimerRaw = ({ timeMs, buttonLabel, onClickButton, buttonDisabled }) => (
+  <div style={{ display: 'flex' }}>
+    <h2 style={{ flex: 1 }}>{renderTime(timeMs)}</h2>
     <button
       className="btn btn-primary"
-      disabled={!onStart}
-      onClick={onStart}>
-      Start!
+      disabled={buttonDisabled}
+      onClick={onClickButton}>
+      {buttonLabel}
     </button>
   </div>
 )
 
+export const NewTimer = ({ durationMs, onStart }) => (
+  <TimerRaw
+    timeMs={durationMs}
+    buttonLabel='Start!'
+    buttonDisabled={!onStart}
+    onClickButton={onStart} />
+)
+
 export const RunningTimer = ({ durationMs, timeSpentMs, onDone }) => (
-  <div>
-    {renderTime(durationMs - timeSpentMs)}
-    <button
-      className="btn btn-primary"
-      onClick={onDone}>
-      Done!
-    </button>
-  </div>
+  <TimerRaw
+    timeMs={durationMs - timeSpentMs}
+    buttonLabel='Done!'
+    onClickButton={onDone} />
 )

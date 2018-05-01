@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import { CycleEditor } from './CycleEditor';
+import React, { Component } from 'react'
+import { CycleEditor } from './CycleEditor'
 import { NewTimer, RunningTimer } from './TimerForm'
 import { DescriptionEditor } from './DescriptionEditor'
+import { FinishedCycle } from './FinishedCycle'
 
 const FIVE_MINUTES_MS = 0.1 * 60 * 1000;
 
@@ -47,11 +48,13 @@ const Updaters = {
     Updaters.resetCycle(),
     Updaters.finishCycle(),
   ),
-  startTimer: () => unlessCurrentTimerSet(({ description }) => ({
-    description: '',
-    timerStart: performance.now(),
-    cycle: { description },
-  })),
+  startTimer: () => unlessCurrentTimerSet(({ description }) =>
+    description.trim() === '' ? {} : {
+      description: '',
+      timerStart: performance.now(),
+      cycle: { description: description.trim() },
+    }
+  ),
   createTimer: ({ durationMs, interval }) => unlessCurrentTimerSet(({ timerStart }) => ({
     currentTimer: {
       timerStart,
@@ -141,13 +144,22 @@ class App extends Component {
   render() {
     const { currentTimer, cycle, finishedCycles, description } = this.state;
     return (
-      <div className="App">
+      <div className="App container">
         <h1>5 Minute Timer!</h1>
         <div className='card'>
           <div className='card-header'>
             {currentTimer
-              ? <RunningTimer {...currentTimer} onDone={this.actions.clearTimer} />
-              : <NewTimer durationMs={this.TIMER_DURATION_MS} onStart={this.actions.startTimer} />}
+              ? (
+                <RunningTimer
+                  durationMs={currentTimer.durationMs}
+                  timeSpentMs={currentTimer.timeSpentMs}
+                  onDone={this.actions.clearTimer} />
+              ) : (
+                <NewTimer
+                  durationMs={this.TIMER_DURATION_MS}
+                  onStart={description.trim() !== '' ? this.actions.startTimer : undefined} />
+              )
+            }
             {cycle && cycle.description}
           </div>
           <div className='card-body'>
@@ -169,11 +181,7 @@ class App extends Component {
         </div>
         <div>
           <h2>Cycles done</h2>
-          {finishedCycles.map((cycle, i) => (
-            <div key={i}>
-              {JSON.stringify(cycle)}
-            </div>
-          ))}
+          {finishedCycles.map((cycle, i) => <FinishedCycle key={i} {...cycle} />)}
         </div>
         <button onClick={() => console.log(this.state)}>Dump</button>
       </div >
